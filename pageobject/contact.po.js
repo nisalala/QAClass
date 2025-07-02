@@ -89,20 +89,28 @@ exports.TestPage = class TestPage {
     await expect(this.page.locator(this.savedCountry)).toHaveText(country);
   }
 
-  async Contactdelete(){
-    await this.page.waitForTimeout(200);
-    this.page.once('dilaog',async dialog =>{
-        console.log(`Dialog message : ${dialog.messsage()}`);
-        await dialog.accept();
-        //dialog.dismiss();
+  async deleteContact(email){
+    await this.page.goto('/contactList');
+    await expect(this.page.locator('body')).toContainText(email);
+    await this.page.locator(`text=${email}`).first().click();
+    
+    // 1. Set up the dialog listener/waiter FIRST
+    await this.page.waitForEvent('dialog', async dialog => {
+      expect(dialog.message()).toBe('Are you sure you want to delete this contact?');
+      expect(dialog.type()).toBe('confirm');
+      await dialog.accept();
     });
-    await this.page.locator(this.deleteContact).cli;ck()
+    // 2. THEN perform the action that triggers the dialog
+    await this.page.locator(this.deleteButton).click();
   }
 
-  async validateDeleteContact(){}
-
-  async viewContact(previousEmail){
-    await this.page.locator(`text=${previousEmail}`).first().click();
+  async deleteContactEXTRA(){
+    await this.page.waitForTimeout(2000);
+    this.page.once('dialog', async dialog => {
+      console.log(`Dialog message: ${dialog.message()}`);
+      await dialog.accept(); // use dialog.dismiss() if you want to cancel instead
+    });
+    await this.page.locator(this.deleteButton).click(); 
   }
 
   async editContact(previousEmail,firstName,lastName,birthdate,email,phone,street1,street2,city,stateProvince,postalCode,country) {
