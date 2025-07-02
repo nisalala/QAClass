@@ -31,55 +31,6 @@ async function getApiBaseUrl() {
   return apiUrl;
 }
 
-async function validateEntity(accessToken,module,status, {request}) {
-    const apiUrl = await getApiBaseUrl();
-    const headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'authorization': "Bearer " + accessToken,
-    };
-    const response = await request.get(apiUrl + module,{
-        headers,
-    } );
-    const statusCode = response.status();
-    expect(statusCode).toBe(parseInt(status));
-}
-
-async function getEntity(accessToken, module, status, {request}){
-    const apiUrl = await getApiBaseUrl();
-    const headers={
-        'Content-Type': "application/json",
-        'Accept': 'application/json',
-        'authorization': "Bearer " + accessToken,
-    };
-    const response = await request.get(apiUrl + module,{
-        headers,
-    });
-    const statusCode = await response.status();
-    expect(statusCode).toBe(parseInt(status));
-    if (responseBody && responseBody[0]._id){
-        return responseBody[0]._id;
-    }else{
-        return null;
-    }
-
-}
-
-async function deleteEntity(accessToken, module, {request}){
-    const apiUrl = await getApiBaseUrl();
-    const headers={
-        'Content-Type': "application/json",
-        'Accept': 'application/json',
-        'authorization': "Bearer " + accessToken,
-    };
-    const response = await request.delete(apiUrl + module,{
-        headers,
-    });
-    const statusCode = response.status();
-    expect(statusCode).toBe(200);
-    
-}
-
 export async function createEntity(userData, accessToken, module, { request }) {
   const apiUrl = await getApiBaseUrl();
   const headers = {
@@ -102,7 +53,50 @@ export async function createEntity(userData, accessToken, module, { request }) {
   }
 }
 
+export async function validateEntity(accessToken, module, status, {request}){
+  const apiUrl = await getApiBaseUrl();
+  const headers = {
+    "Content-Type": "application/json",
+    'Accept': "application/json",
+    'authorization': "Bearer " + accessToken,
+  };
+  const response = await request.get(apiUrl + module, {
+    headers,
+  });
+  const statusCode = response.status();
+  expect(statusCode).toBe(parseInt(status));
+}
 
+export async function getEntity(accessToken, module, status, {request}) {
+  const apiUrl = await getApiBaseUrl();
+  const headers = {
+    "Content-Type": "application/json",
+    'Accept': "application/json",
+    'authorization': "Bearer " + accessToken,
+  };
+  const response = await request.get(apiUrl + module, {
+    headers,
+  });
+  const statusCode = response.status();
+  expect(statusCode).toBe(parseInt(status));
+  const responseBody = await response.json();
+  if (responseBody && responseBody[0]._id){
+    return responseBody[0]._id;
+  } else{
+    return null;
+  }
+}
 
-module.exports={authenticateUser,createEntity,getApiBaseUrl,getEntity, deleteEntity, validateEntity};
-
+export async function deleteEntity(accessToken, module, {request}) {
+  const apiUrl = await getApiBaseUrl();
+  const headers = {
+    "Content-Type": "application/json",
+    'Accept': "application/json",
+    'authorization': "Bearer " + accessToken,
+  };
+  const response = await request.delete(apiUrl + module, {
+    headers,
+  });
+  const statusCode = response.status();
+  expect(statusCode).toBe(200);
+}
